@@ -1,15 +1,15 @@
 [submodule "panda"]
   path = panda
-  url = ../../sunnyhaibin/panda.git
+  url = ../../coral-coder/panda.git
 [submodule "opendbc"]
   path = opendbc
-  url = ../../sunnyhaibin/opendbc.git
+  url = ../../coral-coder/opendbc.git
 [submodule "laika_repo"]
   path = laika_repo
   url = ../../commaai/laika.git
 [submodule "cereal"]
   path = cereal
-  url = ../../sunnyhaibin/cereal.git
+  url = ../../coral-coder/cereal.git
 [submodule "rednose_repo"]
   path = rednose_repo
   url = ../../commaai/rednose.git
