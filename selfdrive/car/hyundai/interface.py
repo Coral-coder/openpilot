@@ -52,6 +52,9 @@ class CarInterface(CarInterfaceBase):
       if 0x38d in fingerprint[0] or 0x38d in fingerprint[2]:
         ret.flags |= HyundaiFlags.USE_FCA.value
 
+      if 0x2AB in fingerprint[0]:
+        ret.flags |= HyundaiFlags.SP_ENHANCED_SCC.value
+
     ret.steerActuatorDelay = 0.1  # Default delay
     ret.steerLimitTimer = 0.4
     tire_stiffness_factor = 1.
@@ -249,8 +252,14 @@ class CarInterface(CarInterfaceBase):
     if candidate in CANFD_CAR:
       bus = 5 if ret.flags & HyundaiFlags.CANFD_HDA2 else 4
       ret.enableBsm = 0x1e5 in fingerprint[bus]
+
+      if 0x1fa in fingerprint[bus]:
+        ret.flags |= HyundaiFlags.SP_NAV_MSG.value
     else:
       ret.enableBsm = 0x58b in fingerprint[0]
+
+      if 0x544 in fingerprint[0]:
+        ret.flags |= HyundaiFlags.SP_NAV_MSG.value
 
     # *** panda safety config ***
     if candidate in CANFD_CAR:
@@ -273,6 +282,9 @@ class CarInterface(CarInterfaceBase):
       if candidate in CAMERA_SCC_CAR:
         ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HYUNDAI_CAMERA_SCC
 
+      if ret.flags & HyundaiFlags.SP_ENHANCED_SCC:
+        ret.safetyConfigs[0].safetyParam |= Panda.FLAG_HYUNDAI_ESCC
+
     if ret.openpilotLongitudinalControl:
       ret.safetyConfigs[-1].safetyParam |= Panda.FLAG_HYUNDAI_LONG
     if candidate in HYBRID_CAR:
@@ -294,7 +306,7 @@ class CarInterface(CarInterfaceBase):
 
   @staticmethod
   def init(CP, logcan, sendcan):
-    if CP.openpilotLongitudinalControl and not (CP.flags & HyundaiFlags.CANFD_CAMERA_SCC.value):
+    if CP.openpilotLongitudinalControl and not ((CP.flags & HyundaiFlags.CANFD_CAMERA_SCC.value) or (CP.flags & HyundaiFlags.SP_ENHANCED_SCC)):
       addr, bus = 0x7d0, 0
       if CP.flags & HyundaiFlags.CANFD_HDA2.value:
         addr, bus = 0x730, 5
